@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Item1
+  - Green
+  - Blue
+  - Red
   layers:
   - Default
   - TransparentFX
