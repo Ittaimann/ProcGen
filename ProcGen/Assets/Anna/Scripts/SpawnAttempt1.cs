@@ -14,6 +14,10 @@ using UnityEngine;
  *     Max range of spawn from central location
  *     Dictionary/table mapping to set probability of each item to spawn
  */
+ //Goals:
+ //generate random clusters of items
+ //priority/rareness idea
+ //spawn intermittently, with time to spawn
 
 public class SpawnAttempt1 : MonoBehaviour {
 
@@ -21,7 +25,7 @@ public class SpawnAttempt1 : MonoBehaviour {
 
     public GameObject spawner;//Gameobject that script is attatched to
 
-    public int totalNumberToSpawn; //max number to spawn
+    public int totalNumberToSpawn; //max number to spawn ///Change to a max num to spawn and a min num to spawn for more customizability
     public float itemSpacing; //spacing between items
     public float maxSpawnRange; //maximum range from spawner location
 
@@ -41,7 +45,24 @@ public class SpawnAttempt1 : MonoBehaviour {
         int index = Random.Range(0, arr.Length);
         return arr[index];
     }
+
+    //Returns bool - False if item2 is not within range of item1, and
+    //True if it is
     
+    bool InRange(GameObject item1, GameObject item2)
+    {
+        Vector2 posItem1 = item1.transform.position;
+        Debug.Log(posItem1);
+        float radiusItem1 = item1.GetComponent<CircleCollider2D>().radius;
+        Debug.Log("Radius: " + radiusItem1);
+        float distance = Vector2.Distance(item1.transform.position, item2.transform.position);
+        // !!!!!!
+        //Add Physics2d.OverlapCircleNonAlloc
+        //Change this function to return array of all objects within range?? 
+        return true;
+    }
+    
+
     //write function to choose one of the 3 types of items to spawn based
     //on probability or random number
 
@@ -49,20 +70,14 @@ public class SpawnAttempt1 : MonoBehaviour {
     void Start()
     {
         Vector2 spawnerPosition = spawner.transform.position; // position of spawner object
-        Debug.Log(spawnerPosition);
+        //Debug.Log(spawnerPosition);
         for (int i = 0; i < totalNumberToSpawn; ++i)
         {
             Vector2 position = SpawnLocations(spawnerPosition);
-            Instantiate(RandomArrayChoice(items), position, Quaternion.identity);
+            GameObject randItem = RandomArrayChoice(items);
+            Instantiate(randItem, position, Quaternion.identity);
+            Debug.Log(InRange(spawner, randItem));
 
         }
     }
-
-	
-	/*// Update is called once per frame
-     * Don't need update because this spawner only
-     * designed to spawn items at beginning
-	void Update () {
-		
-	}*/
 }
