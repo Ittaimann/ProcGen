@@ -196,6 +196,7 @@ GameObject:
   - component: {fileID: 616374588}
   - component: {fileID: 616374587}
   - component: {fileID: 616374586}
+  - component: {fileID: 616374589}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Untagged
@@ -279,6 +280,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &616374589
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 616374585}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.1
 --- !u!1 &727513132
 GameObject:
   m_ObjectHideFlags: 0

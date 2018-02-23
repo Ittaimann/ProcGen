@@ -14,10 +14,22 @@ using UnityEngine;
  *     Max range of spawn from central location
  *     Dictionary/table mapping to set probability of each item to spawn
  */
- //Goals:
- //generate random clusters of items
- //priority/rareness idea
- //spawn intermittently, with time to spawn
+//Goals:
+//generate random clusters of items
+//priority/rareness idea
+//spawn intermittently, with time to spawn
+
+
+
+//Want to spawn a few "seeds" at first *
+//Then, get locations of those seeds *
+//and spawn a few items near those seeds;
+//Check that the items spawned do not overlap with another
+//Then, use this function to get array of item near seed
+//If there are too many near seed, choose another random object in array to be seed
+//spawn objects around that random object then
+//repeat this until spawn count is depleted
+// maybe use recursion? if i can figure out how to use it
 
 public class SpawnAttempt1 : MonoBehaviour {
 
@@ -28,6 +40,8 @@ public class SpawnAttempt1 : MonoBehaviour {
     public int totalNumberToSpawn; //max number to spawn ///Change to a max num to spawn and a min num to spawn for more customizability
     public float itemSpacing; //spacing between items
     public float maxSpawnRange; //maximum range from spawner location
+
+    private List<Vector2> initialPositionsList = new List<Vector2>();//used to store positions of initially spawned objects, which are seeds 
 
     
     // Returns random SpawnLocation based on spawnPos of spawner and maxSpawnRange from center of spawner
@@ -59,9 +73,40 @@ public class SpawnAttempt1 : MonoBehaviour {
         // !!!!!!
         //Add Physics2d.OverlapCircleNonAlloc
         //Change this function to return array of all objects within range?? 
+
         return true;
     }
-    
+
+    //Spawns totalNumberToSpawn/4, as initial seed from which clusters will form
+    //first, spawn totalNumberToSpawn/divideBy
+    //but if totalNumberToSpawn/divideBy is less than 1, only spawn one initial item
+    void InitialSpawn()
+    {
+        Vector2 spawnerPosition = spawner.transform.position; // position of spawner object
+        int divideBy = 4; // number to divide totalNumberToSpawn by (so I can change it easier later if I want)
+
+        if (totalNumberToSpawn/divideBy < 1)
+        {
+            Vector2 position = SpawnLocations(spawnerPosition);
+            GameObject justSpawned = Instantiate(RandomArrayChoice(items), position, Quaternion.identity);
+            totalNumberToSpawn--;
+            initialPositionsList.Add(justSpawned.transform.position);
+        }
+        else
+        {
+            for (int i = 0; i < totalNumberToSpawn/divideBy; ++i)
+            {
+                Vector2 position = SpawnLocations(spawnerPosition);
+                GameObject randItem = RandomArrayChoice(items);
+                GameObject justSpawned = Instantiate(randItem, position, Quaternion.identity);
+                totalNumberToSpawn--;
+                initialPositionsList.Add(justSpawned.transform.position);
+                //Debug.Log(justSpawned.transform.position);
+                //Debug.Log(InRange(spawner, randItem));
+            }
+
+        }
+    }
 
     //write function to choose one of the 3 types of items to spawn based
     //on probability or random number
@@ -69,15 +114,6 @@ public class SpawnAttempt1 : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        Vector2 spawnerPosition = spawner.transform.position; // position of spawner object
-        //Debug.Log(spawnerPosition);
-        for (int i = 0; i < totalNumberToSpawn; ++i)
-        {
-            Vector2 position = SpawnLocations(spawnerPosition);
-            GameObject randItem = RandomArrayChoice(items);
-            Instantiate(randItem, position, Quaternion.identity);
-            Debug.Log(InRange(spawner, randItem));
-
-        }
+        InitialSpawn();
     }
 }
