@@ -44,10 +44,9 @@ public class SpawnAttempt1 : MonoBehaviour {
     private List<Vector2> initialPositionsList = new List<Vector2>();//used to store positions of initially spawned objects, which are seeds 
 
     
-    // Returns random SpawnLocation based on spawnPos of spawner and maxSpawnRange from center of spawner
-    Vector2 SpawnLocations(Vector2 spawnPos)
+    // Returns random SpawnLocation based on spawnPos of spawner and max range from center of spawner
+    Vector2 SpawnLocation(Vector2 spawnPos, float max)
     {
-        float max = (float)maxSpawnRange;
         float randX = Random.Range(-max, max) + spawnPos.x;
         float randY = Random.Range(-max, max) + spawnPos.y;
         return new Vector2(randX, randY);
@@ -62,8 +61,8 @@ public class SpawnAttempt1 : MonoBehaviour {
 
     //Returns bool - False if item2 is not within range of item1, and
     //True if it is
-    
-    bool InRange(GameObject item1, GameObject item2)
+
+    /*bool InRange(GameObject item1, GameObject item2)
     {
         Vector2 posItem1 = item1.transform.position;
         Debug.Log(posItem1);
@@ -75,9 +74,17 @@ public class SpawnAttempt1 : MonoBehaviour {
         //Change this function to return array of all objects within range?? 
 
         return true;
+    }*/
+
+    //Spawns a single GameObject at the spawnerPosition
+    GameObject SpawnOneItem(Vector2 spawnerPosition, float maxSpawnRange)
+    {
+        Vector2 position = SpawnLocation(spawnerPosition, maxSpawnRange);
+        GameObject randItem = RandomArrayChoice(items);
+        return Instantiate(randItem, position, Quaternion.identity);
     }
 
-    //Spawns totalNumberToSpawn/4, as initial seed from which clusters will form
+    //Spawns totalNumberToSpawn/divideBy, as initial seed from which clusters will form
     //first, spawn totalNumberToSpawn/divideBy
     //but if totalNumberToSpawn/divideBy is less than 1, only spawn one initial item
     void InitialSpawn()
@@ -87,8 +94,7 @@ public class SpawnAttempt1 : MonoBehaviour {
 
         if (totalNumberToSpawn/divideBy < 1)
         {
-            Vector2 position = SpawnLocations(spawnerPosition);
-            GameObject justSpawned = Instantiate(RandomArrayChoice(items), position, Quaternion.identity);
+            GameObject justSpawned = SpawnOneItem(spawnerPosition, maxSpawnRange);
             totalNumberToSpawn--;
             initialPositionsList.Add(justSpawned.transform.position);
         }
@@ -96,16 +102,28 @@ public class SpawnAttempt1 : MonoBehaviour {
         {
             for (int i = 0; i < totalNumberToSpawn/divideBy; ++i)
             {
-                Vector2 position = SpawnLocations(spawnerPosition);
-                GameObject randItem = RandomArrayChoice(items);
-                GameObject justSpawned = Instantiate(randItem, position, Quaternion.identity);
+                GameObject justSpawned = SpawnOneItem(spawnerPosition, maxSpawnRange);
                 totalNumberToSpawn--;
                 initialPositionsList.Add(justSpawned.transform.position);
-                //Debug.Log(justSpawned.transform.position);
-                //Debug.Log(InRange(spawner, randItem));
             }
+        }
+    }
+
+    //Spawn in clusters after the initial spawning of seeds
+    void SpawnMore()
+    {
+        float maxRange = (float)2.0;
+
+        while (totalNumberToSpawn != 0)
+        {
+            int index = Random.Range(0, initialPositionsList.Count); // gets random index from list
+            Vector2 spawnerPosition = initialPositionsList[index]; //random spawn location from the seeds available
+            GameObject justSpawned = SpawnOneItem(spawnerPosition, maxRange);
+            totalNumberToSpawn--;
+            Debug.Log(totalNumberToSpawn);
 
         }
+
     }
 
     //write function to choose one of the 3 types of items to spawn based
@@ -115,5 +133,7 @@ public class SpawnAttempt1 : MonoBehaviour {
     void Start()
     {
         InitialSpawn();
+        Debug.Log(totalNumberToSpawn);
+        SpawnMore();
     }
 }

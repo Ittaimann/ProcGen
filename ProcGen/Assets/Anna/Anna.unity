@@ -220,7 +220,7 @@ MonoBehaviour:
   - {fileID: 1109089527499830, guid: 50dad92c513fbdf4f9e3912a3c4433d9, type: 2}
   - {fileID: 1543415374323758, guid: b8fd45dd2e27a34438b9084f3905f72f, type: 2}
   spawner: {fileID: 616374585}
-  totalNumberToSpawn: 50
+  totalNumberToSpawn: 20
   itemSpacing: 0
   maxSpawnRange: 10
 --- !u!212 &616374587
