@@ -35,7 +35,6 @@ public class SpawnAttempt1 : MonoBehaviour {
     public GameObject[] items = new GameObject[3]; //array of items to spawn
     public GameObject spawner;//Gameobject that script is attatched to
     public int totalNumberToSpawn; //max number to spawn ///Change to a max num to spawn and a min num to spawn for more customizability
-    public float itemSpacing; //spacing between items
     public float maxSpawnRange; //maximum range from spawner location
     private List<Vector2> initialPositionsList = new List<Vector2>();//used to store positions of initially spawned objects, which are seeds 
     
@@ -117,7 +116,6 @@ public class SpawnAttempt1 : MonoBehaviour {
             Vector2 spawnerPosition = initialPositionsList[index]; //random spawn location from the seeds available
             GameObject justSpawned = SpawnOneItem(spawnerPosition, maxRange);
             totalNumberToSpawn--;
-            Debug.Log(totalNumberToSpawn);
         }
     }
 
@@ -128,7 +126,6 @@ public class SpawnAttempt1 : MonoBehaviour {
     void Start()
     {
         InitialSpawn();
-        Debug.Log(totalNumberToSpawn);
         SpawnMore();
     }
 }
