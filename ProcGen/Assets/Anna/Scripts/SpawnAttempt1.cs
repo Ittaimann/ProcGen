@@ -20,11 +20,10 @@ using UnityEngine;
 //spawn intermittently, with time to spawn
 
 
-
 //Want to spawn a few "seeds" at first *
 //Then, get locations of those seeds *
 //and spawn a few items near those seeds; *
-//Check that the items spawned do not overlap with another
+//Check that the items spawned do not overlap with another *
 //Then, use this function to get array of item near seed
 //If there are too many near seed, choose another random object in array to be seed
 //spawn objects around that random object then
@@ -34,16 +33,11 @@ using UnityEngine;
 public class SpawnAttempt1 : MonoBehaviour {
 
     public GameObject[] items = new GameObject[3]; //array of items to spawn
-
     public GameObject spawner;//Gameobject that script is attatched to
-
     public int totalNumberToSpawn; //max number to spawn ///Change to a max num to spawn and a min num to spawn for more customizability
     public float itemSpacing; //spacing between items
     public float maxSpawnRange; //maximum range from spawner location
-
     private List<Vector2> initialPositionsList = new List<Vector2>();//used to store positions of initially spawned objects, which are seeds 
-
-    public Collider2D[] colliders;
     
     // Returns random SpawnLocation based on spawnPos of spawner and max range from center of spawner
     Vector2 SpawnLocation(Vector2 spawnPos, float max)
@@ -60,26 +54,31 @@ public class SpawnAttempt1 : MonoBehaviour {
         return arr[index];
     }
 
-    //Spawns a single GameObject at the spawnerPosition
+    //Spawns a single GameObject at the spawnerPosition, and also makes sure there are no overlapping objects
     GameObject SpawnOneItem(Vector2 spawnerPosition, float maxSpawnRange)
     {
-        Vector2 position = SpawnLocation(spawnerPosition, maxSpawnRange);
-        bool canSpawnHere = PreventSpawnOverlap(position);
-        Debug.Log(position);
-        Debug.Log("YOU CAN " + canSpawnHere);
-
-
-        //DOESNT WORK
-        while (canSpawnHere == false)
-        {
-            position = SpawnLocation(spawnerPosition, maxSpawnRange);
-            canSpawnHere = PreventSpawnOverlap(position);
-            Debug.Log(canSpawnHere);
-
-        }
-
+        Vector2 position = SpawnLocation(spawnerPosition, maxSpawnRange);    
         GameObject randItem = RandomArrayChoice(items);
-        return Instantiate(randItem, position, Quaternion.identity);
+        GameObject spawned = Instantiate(randItem, position, Quaternion.identity);
+        int num = NumberColliding(spawned);
+        
+        //reset position if spawned overlaps with another gameobject
+        while (num != 0)
+        {
+            Destroy(spawned); //delete old gameobject
+            position = SpawnLocation(spawnerPosition, maxSpawnRange); //change position of item to be spawned
+            spawned = Instantiate(randItem, position, Quaternion.identity);
+            num = NumberColliding(spawned);
+        }
+        return spawned;
+    }
+
+    //Returns number of colliders touching justSpawned. 0 if it is not touching. Try to prevent overlap using this function
+    int NumberColliding(GameObject justSpawned)
+    {
+        ContactFilter2D na = new ContactFilter2D(); //empty contact filter as placeholder
+        int numColliding = Physics2D.OverlapCollider(justSpawned.GetComponent<Collider2D>(), na, new Collider2D[20]);
+        return numColliding;
     }
 
     //Spawns totalNumberToSpawn/divideBy, as initial seed from which clusters will form
@@ -110,7 +109,6 @@ public class SpawnAttempt1 : MonoBehaviour {
     //Spawn in clusters after the initial spawning of seeds
     void SpawnMore()
     {
-
         float maxRange = (float)2.0;
 
         while (totalNumberToSpawn != 0)
@@ -120,50 +118,8 @@ public class SpawnAttempt1 : MonoBehaviour {
             GameObject justSpawned = SpawnOneItem(spawnerPosition, maxRange);
             totalNumberToSpawn--;
             Debug.Log(totalNumberToSpawn);
-
         }
-
     }
-
-    //DOESNT WORK
-    bool PreventSpawnOverlap(Vector2 spawnPos)
-    {
-        colliders = Physics2D.OverlapCircleAll(transform.position, 5);//1 is radius, find better solution
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            Vector2 centerPoint = colliders[i].bounds.center;
-            float width = colliders[i].bounds.extents.x;
-            float height = colliders[i].bounds.extents.y;
-            float leftExtent = centerPoint.x - width;
-            float rightExtent = centerPoint.x + width;
-            float lowerExtent = centerPoint.y - height;
-            float upperExtent = centerPoint.y + height;
-
-            if (spawnPos.x >= leftExtent && spawnPos.x <= rightExtent)
-            {
-                if (spawnPos.y >= lowerExtent && spawnPos.y <= upperExtent)
-                    return false;
-            }
-        }
-        return true;
-    }
-
-    /*
-    //Return true if object collides with another
-    int HasCollisions(GameObject spawning)
-    {
-        
-        Debug.Log(spawning.transform.position);
-        Collider2D[] results = new Collider2D[100];
-        int number = spawning.GetComponent<Collider2D>().GetContacts(results);
-        Debug.Log("NUM" + number);
-        return number;
-        //Collider2D already = alreadySpawned.GetComponent<Collider2D>();
-        //Collider2D spawn = spawning.GetComponent<Collider2D>();
-        //return already.IsTouching(spawn);
-    
-    }
-    */
 
     //write function to choose one of the 3 types of items to spawn based
     //on probability or random number
