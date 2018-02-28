@@ -23,7 +23,7 @@ using UnityEngine;
 
 //Want to spawn a few "seeds" at first *
 //Then, get locations of those seeds *
-//and spawn a few items near those seeds;
+//and spawn a few items near those seeds; *
 //Check that the items spawned do not overlap with another
 //Then, use this function to get array of item near seed
 //If there are too many near seed, choose another random object in array to be seed
@@ -43,6 +43,7 @@ public class SpawnAttempt1 : MonoBehaviour {
 
     private List<Vector2> initialPositionsList = new List<Vector2>();//used to store positions of initially spawned objects, which are seeds 
 
+    public Collider2D[] colliders;
     
     // Returns random SpawnLocation based on spawnPos of spawner and max range from center of spawner
     Vector2 SpawnLocation(Vector2 spawnPos, float max)
@@ -59,27 +60,24 @@ public class SpawnAttempt1 : MonoBehaviour {
         return arr[index];
     }
 
-    //Returns bool - False if item2 is not within range of item1, and
-    //True if it is
-
-    /*bool InRange(GameObject item1, GameObject item2)
-    {
-        Vector2 posItem1 = item1.transform.position;
-        Debug.Log(posItem1);
-        float radiusItem1 = item1.GetComponent<CircleCollider2D>().radius;
-        Debug.Log("Radius: " + radiusItem1);
-        float distance = Vector2.Distance(item1.transform.position, item2.transform.position);
-        // !!!!!!
-        //Add Physics2d.OverlapCircleNonAlloc
-        //Change this function to return array of all objects within range?? 
-
-        return true;
-    }*/
-
     //Spawns a single GameObject at the spawnerPosition
     GameObject SpawnOneItem(Vector2 spawnerPosition, float maxSpawnRange)
     {
         Vector2 position = SpawnLocation(spawnerPosition, maxSpawnRange);
+        bool canSpawnHere = PreventSpawnOverlap(position);
+        Debug.Log(position);
+        Debug.Log("YOU CAN " + canSpawnHere);
+
+
+        //DOESNT WORK
+        while (canSpawnHere == false)
+        {
+            position = SpawnLocation(spawnerPosition, maxSpawnRange);
+            canSpawnHere = PreventSpawnOverlap(position);
+            Debug.Log(canSpawnHere);
+
+        }
+
         GameObject randItem = RandomArrayChoice(items);
         return Instantiate(randItem, position, Quaternion.identity);
     }
@@ -112,6 +110,7 @@ public class SpawnAttempt1 : MonoBehaviour {
     //Spawn in clusters after the initial spawning of seeds
     void SpawnMore()
     {
+
         float maxRange = (float)2.0;
 
         while (totalNumberToSpawn != 0)
@@ -125,6 +124,46 @@ public class SpawnAttempt1 : MonoBehaviour {
         }
 
     }
+
+    //DOESNT WORK
+    bool PreventSpawnOverlap(Vector2 spawnPos)
+    {
+        colliders = Physics2D.OverlapCircleAll(transform.position, 5);//1 is radius, find better solution
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Vector2 centerPoint = colliders[i].bounds.center;
+            float width = colliders[i].bounds.extents.x;
+            float height = colliders[i].bounds.extents.y;
+            float leftExtent = centerPoint.x - width;
+            float rightExtent = centerPoint.x + width;
+            float lowerExtent = centerPoint.y - height;
+            float upperExtent = centerPoint.y + height;
+
+            if (spawnPos.x >= leftExtent && spawnPos.x <= rightExtent)
+            {
+                if (spawnPos.y >= lowerExtent && spawnPos.y <= upperExtent)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    /*
+    //Return true if object collides with another
+    int HasCollisions(GameObject spawning)
+    {
+        
+        Debug.Log(spawning.transform.position);
+        Collider2D[] results = new Collider2D[100];
+        int number = spawning.GetComponent<Collider2D>().GetContacts(results);
+        Debug.Log("NUM" + number);
+        return number;
+        //Collider2D already = alreadySpawned.GetComponent<Collider2D>();
+        //Collider2D spawn = spawning.GetComponent<Collider2D>();
+        //return already.IsTouching(spawn);
+    
+    }
+    */
 
     //write function to choose one of the 3 types of items to spawn based
     //on probability or random number
