@@ -144,7 +144,7 @@ MonoBehaviour:
   length: 10
   angle: 90
   root: {fileID: 1245656968224574, guid: 8e294cca5f013174aa96621c7d2f59a7, type: 2}
-  sentence: {fileID: 0}
+  sentence: {fileID: 11400000, guid: 85d8c5ed38e61f6449d2b3f3ce215d56, type: 2}
 --- !u!4 &298648909
 Transform:
   m_ObjectHideFlags: 0
@@ -186,9 +186,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sentenceName: Maze1
-  rules: {fileID: 11400000, guid: 37dfa55e0642d984c92841ba131b2862, type: 2}
-  gridx: 2
-  gridy: 2
+  rules: {fileID: 11400000, guid: 746ca94c6b04de848a58ed93193d6ade, type: 2}
+  gridx: 10
+  gridy: 10
 --- !u!4 &849406468
 Transform:
   m_ObjectHideFlags: 0

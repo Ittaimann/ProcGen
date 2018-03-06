@@ -14,6 +14,7 @@ public abstract class Turtle : MonoBehaviour {
 	private Camera camera;
 	void Start() {
 		Init();
+		DrawTree();
 	}
 
 	protected void Init() {
@@ -50,7 +51,6 @@ public abstract class Turtle : MonoBehaviour {
 		Mesh mesh = plane.GetComponent<MeshFilter>().mesh;
 		Vector3[] vertices = mesh.vertices;
 		Vector2 width = new Vector2(.1f, 0);
-		int[] orders = new int[4];
 		float radius = Vector2.Distance(start, end) / 2;
 		vertices[0] = end + new Vector2(-radius, -radius);
 		vertices[1] = end + new Vector2(radius, radius);
@@ -70,7 +70,7 @@ public abstract class Turtle : MonoBehaviour {
 		tree.transform.parent = transform;
 		Vector2 new_pos;
 		state_stack.Push(cur_state.clone());
-		foreach(char c in getSentence())
+		foreach(char c in getSentence()) {
 			switch(c) {
 				case 'F':
 					new_pos = cur_state.cursor + new Vector2(Mathf.Cos(cur_state.angle), Mathf.Sin(cur_state.angle)) * length;
@@ -93,6 +93,7 @@ public abstract class Turtle : MonoBehaviour {
 					cur_state = state_stack.Pop();
 					break;
 			}
+		}
 		cur_state = state_stack.Pop();
 	}
 }

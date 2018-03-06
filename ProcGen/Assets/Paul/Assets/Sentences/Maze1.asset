@@ -1,0 +1,14 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf030ab50916faf49852d52dd1889449, type: 3}
+  m_Name: Maze1
+  m_EditorClassIdentifier: 
+  sentence: ++G++F+F-F+F-++FF++-FFFFFFF[+++F+++FFFFFFF-++F++-FFFFFFFFF[+++F+++FFFFFFFFF-++F++-FFFFFFFFF+++F+++FFFFFFFFF-++F++-FFFFFFFFF+++F+++FFFFFFFFF]+F+F-FF-F[+++F]+F+FFFFF]+F+FFFF-F+F

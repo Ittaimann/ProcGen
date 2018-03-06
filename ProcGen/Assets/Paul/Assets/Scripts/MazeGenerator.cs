@@ -10,69 +10,45 @@ public class MazeGenerator : MonoBehaviour {
 
 	public int gridx, gridy;
 	private Direction direction;
-	private StringBuilder program;
-	private StringBuilder save;
 	private bool [,] visited;
 	private int visitedCount = 0;
 	private int [] dx, dy;
-	private int index, saveIndex, size;
-	private bool [,] inBranch;
-	private bool saved = false;
-	private int [,] gridToBufferIndex;
 	private Direction [] directions;
 	private Direction [] opposite;
+	private CaretTree tree;
+	private StringBuilder lsymbols;
+	private CaretTree.Node parent, head;
+	private Direction [,] directionMap;
 
 	public void Awake() {
 		direction = Direction.N;
-		program = new StringBuilder();
-		program.Append("0");
 		visited = new bool[gridx, gridy];
 		dx = new int[4]{0, -1, 1, 0};
 		dy = new int[4]{1, 0, 0, -1};
-		index = 0;
-		size = 0;
-		saveIndex = 0;
-		gridToBufferIndex = new int[gridx, gridy];
-		inBranch = new bool[gridx, gridy];
- 		directions = new Direction[] {Direction.N, Direction.W, Direction.E, Direction.S};
+ 		directions = new Direction[4] {Direction.N, Direction.W, Direction.E, Direction.S};
 		opposite = new Direction[4]{Direction.S, Direction.E, Direction.W, Direction.N};
+		tree = new CaretTree();
+		head = parent = null;
+		lsymbols = new StringBuilder();
+		directionMap = new Direction[gridx, gridy];
 	}
 
 	public string generate() {
-		int [] pos = new int[2]{Random.Range(0, gridx - 1), 
-		                        Random.Range(0, gridy - 1)};
+		lsymbols.Append("++G++");
+		int x = Random.Range(0, gridx - 1),
+		    y = Random.Range(0, gridy - 1);
+		insertDirection(direction);
+		CaretTree.Node current = new CaretTree.Node(lsymbols.ToString(), x, y);
+		Debug.Log("Start: " + x + " " + y);
+		tree.AddNode(null, null, current);
 		int total = gridx * gridy;
-		insertIntoBuffer('[');
-		++visitedCount;
-		insertIntoBuffer("--G++F");
 		while(visitedCount < total) {
-			pos = walk(pos[0], pos[1]);
-			if(pos == null) {
-				if(saved)
-					reset();
-				else	
-					insertIntoBuffer(']');
-				pos = hunt();	
-			}
+			ClearBuffer();
+			current = walk(current.x, current.y);
+			if(current == null)
+				current = hunt();	
 		}
-		program.Insert(size, ']');
-		return program.ToString();
-	}
-
-	private void reset() {
-		insertIntoBuffer(']');
-		string res = program.ToString();
-		int fromHere = index;
-		program = save;
-		index = saveIndex;
-		insertIntoBuffer(res);
-		for(int i = 0; i < gridx; ++i)
-			for(int j = 0; j < gridy; ++j)
-				if(gridToBufferIndex[i,j] > fromHere && !inBranch[i, j])
-					gridToBufferIndex[i,j] += res.Length;
-				else if(inBranch[i, j])
-					inBranch[i,j] = true;
-		saved = false;
+		return tree.Combine();
 	}
 
 	private int[] permutation(int range) {
@@ -101,59 +77,60 @@ public class MazeGenerator : MonoBehaviour {
 	}
 
 	private void insertIntoBuffer(char c) {
-		program.Insert(index++, c);
-		++size;
+		lsymbols.Append(c);
 	}
 
 	private void insertIntoBuffer(string s) {
-		program.Insert(index, s);
-		index += s.Length;
-		size += s.Length;
+		lsymbols.Append(s);
 	}
-
-	private int[] walk(int x, int y) {
+	private void ClearBuffer() {
+		lsymbols.Remove(0, lsymbols.Length);
+	}
+	private CaretTree.Node walk(int x, int y) {
 		int [] indices = permutation(4);
 		int nx, ny;
+		if(visited[x,y]) {
+			Debug.Assert(false);
+			return null;
+		}
+		directionMap[x,y] = direction;
+		visited[x,y] = true;
+		++visitedCount;
 		for(int i = 0; i < 4; ++i) {
 			nx = x + dx[(int) directions[indices[i]]];
 			ny = y + dy[(int) directions[indices[i]]];
 			if (nx > -1 && nx < gridx && ny > -1 && ny < gridy && !visited[nx,ny]) {
 				insertDirection(directions[indices[i]]);
-				gridToBufferIndex[x,y] = index;
-				if(saved)
-					inBranch[x,y] = true;
-				visited[x,y] = true;
-				++visitedCount;
-				return new int[2] {nx, ny};
+				CaretTree.Node newNode = new CaretTree.Node(lsymbols.ToString(), nx, ny);
+				Debug.Log("BeginNode: " + x + " " + y);
+				Debug.Log("EndNode: " + nx + " " + ny);
+				tree.AddNode(parent, head, newNode);
+				return newNode;
 			}
 		}
 		return null;
 	}
 
-	private int[] hunt() {
+	private CaretTree.Node hunt() {
 		int [] indices = permutation(4);
 		int nx, ny;
-		for(int i = 0; i < gridx; ++i)
-			for(int j = 0; j < gridy; ++j)
+		for(int j = 0; j < gridy; ++j)
+			for(int i = 0; i < gridx; ++i)
 				if(!visited[i,j])
 					for(int d = 0; d < 4; ++d) {
 						nx = i + dx[(int) directions[indices[d]]];
 						ny = j + dy[(int) directions[indices[d]]];
 						if (nx > -1 && nx < gridx && ny > -1 && ny < gridy && visited[nx, ny]) {
-							saveIndex = index;
-							save = program;
-							saved = true;
-							program = new StringBuilder();
-							index = gridToBufferIndex[nx, ny];
-							insertIntoBuffer('[');
+							direction = directionMap[nx, ny];
+							Debug.Log("Hunt: " + direction + " " + opposite[(int) directions[d]]);
 							insertDirection(opposite[(int) directions[indices[d]]]);
-							gridToBufferIndex[i,j] = index;
-							insertIntoBuffer(']');
-							insertIntoBuffer('[');
-							visited[i, j] = true;
-							inBranch[i, j] = true;
-							++visitedCount;
-							return new int[2]{nx, ny};	
+							CaretTree.Node newNode = new CaretTree.Node(lsymbols.ToString(), i, j);
+							parent = tree.GetNode(nx, ny);
+							Debug.Log("Node: " + i + " " + j);
+							Debug.Log("Parent: " + parent.x + " " + parent.y);
+							head = newNode;
+							tree.AddNode(parent, null, newNode);
+							return newNode;
 						}
 					}
 		return null;
