@@ -6,6 +6,7 @@ using UnityEngine;
 public class MazeGenerator : MonoBehaviour {
 	public string sentenceName;
 	public enum Direction {N, W, E, S};
+	public enum Wall {A, L, R, B};
 	public Rules rules;
 
 	public int gridx, gridy;
@@ -17,7 +18,7 @@ public class MazeGenerator : MonoBehaviour {
 	private Direction [] opposite;
 	private CaretTree tree;
 	private StringBuilder lsymbols;
-	private CaretTree.Node parent, head;
+	private CaretTree.Node parent, head, prev;
 	private Direction [,] directionMap;
 
 	public void Awake() {
@@ -28,7 +29,7 @@ public class MazeGenerator : MonoBehaviour {
  		directions = new Direction[4] {Direction.N, Direction.W, Direction.E, Direction.S};
 		opposite = new Direction[4]{Direction.S, Direction.E, Direction.W, Direction.N};
 		tree = new CaretTree();
-		head = parent = null;
+		prev = head = parent = null;
 		lsymbols = new StringBuilder();
 		directionMap = new Direction[gridx, gridy];
 	}
@@ -37,9 +38,8 @@ public class MazeGenerator : MonoBehaviour {
 		lsymbols.Append("++G++");
 		int x = Random.Range(0, gridx - 1),
 		    y = Random.Range(0, gridy - 1);
-		insertDirection(direction);
+		insertIntoBuffer('F');
 		CaretTree.Node current = new CaretTree.Node(lsymbols.ToString(), x, y);
-		Debug.Log("Start: " + x + " " + y);
 		tree.AddNode(null, null, current);
 		int total = gridx * gridy;
 		while(visitedCount < total) {
@@ -66,14 +66,16 @@ public class MazeGenerator : MonoBehaviour {
 		return perm.ToArray();
 	}
 
-	private void insertDirection(Direction d) {
+	private void correctDirection(Direction d) {
 		if(direction != d) {
 			restore();
 			direction = d;
 			insertIntoBuffer(rules.rules[(int) d].RHS);
 		}
-		else
-			insertIntoBuffer('F');
+	}
+
+	private void insertWall(Direction d) {
+		insertIntoBuffer(((Wall) d).ToString());
 	}
 
 	private void insertIntoBuffer(char c) {
@@ -87,28 +89,54 @@ public class MazeGenerator : MonoBehaviour {
 		lsymbols.Remove(0, lsymbols.Length);
 	}
 	private CaretTree.Node walk(int x, int y) {
-		int [] indices = permutation(4);
-		int nx, ny;
 		if(visited[x,y]) {
 			Debug.Assert(false);
 			return null;
 		}
+		int [] indices = permutation(4);
+		CaretTree.Node newNode = null;
+		bool found = false;
 		directionMap[x,y] = direction;
 		visited[x,y] = true;
 		++visitedCount;
+		/*Find walls. A wall is created for either:
+		1. edges of the grid or 
+		2. neighboring points that have already been visited*/
+		int wx = 0, wy = 0;
+		for(int i = 0; i < 4; ++i) {
+			wx = x + dx[(int) directions[indices[i]]];
+			wy = y + dy[(int) directions[indices[i]]];
+			if(!(wx > -1 && wx < gridx && wy > -1 && wy < gridy)) {
+				insertWall(directions[indices[i]]);
+				tree.GetNode(x, y).addWall();
+			}
+			else if(prev != null && !(prev.x == wx && prev.y == wy) && visited[wx, wy] && tree.GetNode(wx, wy).wallCount < 3 && tree.GetNode(x,y).wallCount < 3) {
+				tree.GetNode(wx, wy).addWall();
+				tree.GetNode(x, y).addWall();
+				insertWall(directions[indices[i]]);
+			}
+		}
+		int nx = 0, ny = 0;
+		//Find neighboring point in grid that hasn't been visited
 		for(int i = 0; i < 4; ++i) {
 			nx = x + dx[(int) directions[indices[i]]];
 			ny = y + dy[(int) directions[indices[i]]];
 			if (nx > -1 && nx < gridx && ny > -1 && ny < gridy && !visited[nx,ny]) {
-				insertDirection(directions[indices[i]]);
-				CaretTree.Node newNode = new CaretTree.Node(lsymbols.ToString(), nx, ny);
-				Debug.Log("BeginNode: " + x + " " + y);
-				Debug.Log("EndNode: " + nx + " " + ny);
-				tree.AddNode(parent, head, newNode);
-				return newNode;
+				correctDirection(directions[indices[i]]);
+				found = true;
+				break;
 			}
 		}
-		return null;
+		if(found) {
+			insertIntoBuffer('F');
+			newNode = new CaretTree.Node(lsymbols.ToString(), nx, ny);
+			tree.AddNode(parent, head, newNode);
+			prev = tree.GetNode(x, y);
+		} else {
+			CaretTree.Node leftovers = new CaretTree.Node(lsymbols.ToString(), -1, -1);
+			tree.AddNode(parent, head, leftovers);
+		}
+		return newNode;
 	}
 
 	private CaretTree.Node hunt() {
@@ -122,12 +150,10 @@ public class MazeGenerator : MonoBehaviour {
 						ny = j + dy[(int) directions[indices[d]]];
 						if (nx > -1 && nx < gridx && ny > -1 && ny < gridy && visited[nx, ny]) {
 							direction = directionMap[nx, ny];
-							Debug.Log("Hunt: " + direction + " " + opposite[(int) directions[d]]);
-							insertDirection(opposite[(int) directions[indices[d]]]);
+							correctDirection(opposite[(int) directions[indices[d]]]);
+							insertIntoBuffer('F');
 							CaretTree.Node newNode = new CaretTree.Node(lsymbols.ToString(), i, j);
-							parent = tree.GetNode(nx, ny);
-							Debug.Log("Node: " + i + " " + j);
-							Debug.Log("Parent: " + parent.x + " " + parent.y);
+							prev = parent = tree.GetNode(nx, ny);
 							head = newNode;
 							tree.AddNode(parent, null, newNode);
 							return newNode;

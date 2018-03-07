@@ -13,10 +13,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rules:
   - LHS: 78
-    RHS: F
+    RHS: 
   - LHS: 87
-    RHS: -F
+    RHS: '-'
   - LHS: 69
-    RHS: +F
+    RHS: +
   - LHS: 83
-    RHS: ++F
+    RHS: ++
