@@ -6,19 +6,18 @@ public abstract class Turtle : MonoBehaviour {
 	public float width = .1f;
 	public float length = 10f;
 	public float angle = 90f;
+	public Material groundMat, wallMat;
 	private float rad_angle;
 	public GameObject root;
 	private GameObject tree;
 	private Stack<State> state_stack;
 	private State cur_state;
-	private Camera camera;
 	void Start() {
 		Init();
 		DrawTree();
 	}
 
 	protected void Init() {
-		camera = GameObject.Find("Main Camera").GetComponent<Camera>();
 		rad_angle = angle * Mathf.PI / 180f;
 		cur_state = new State(new Vector2(-2, -2), rad_angle);
 		state_stack = new Stack<State>();
@@ -58,6 +57,10 @@ public abstract class Turtle : MonoBehaviour {
 		//Create mesh
 		mesh.vertices = vertices;
 		mesh.RecalculateBounds();
+		MeshCollider coll = plane.GetComponent<MeshCollider>();
+		coll.sharedMesh = null;
+		coll.sharedMesh = mesh;
+		plane.GetComponent<Renderer>().material = groundMat;
 		Parent(plane);
 	}
 	private void PlaceBackUnit(Vector2 start, Vector2 end) {
@@ -90,6 +93,10 @@ public abstract class Turtle : MonoBehaviour {
 		//Create mesh
 		mesh.vertices = vertices;
 		mesh.RecalculateBounds();
+		MeshCollider coll = plane.GetComponent<MeshCollider>();
+		coll.sharedMesh = null;
+		coll.sharedMesh = mesh;
+		plane.GetComponent<Renderer>().material = wallMat;
 		Parent(plane);
 	}
 	private void PlaceBackWall(Vector2 center, Vector2 direction) {
@@ -107,11 +114,15 @@ public abstract class Turtle : MonoBehaviour {
 		//Create mesh
 		mesh.vertices = vertices;
 		mesh.RecalculateBounds();
+		MeshCollider coll = plane.GetComponent<MeshCollider>();
+		coll.sharedMesh = null;
+		coll.sharedMesh = mesh;
+		plane.GetComponent<Renderer>().material = wallMat;
 		Parent(plane);
 	}
 
 	void Parent(GameObject go) {
-		go.transform.parent = transform;
+		go.transform.parent = tree.transform;
 	}
 
 	protected abstract string getSentence();
@@ -173,6 +184,7 @@ public abstract class Turtle : MonoBehaviour {
 					break;
 			}
 		}
+		tree.transform.Rotate(new Vector3(90, 0, 0));
 		cur_state = state_stack.Pop();
 	}
 }
