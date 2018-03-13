@@ -49,6 +49,10 @@ public class SerializeMesh : MonoBehaviour
 		mesh.RecalculateNormals();
 		mesh.RecalculateBounds();
 
+		MeshCollider coll = gameObject.GetComponent<MeshCollider>();
+		coll.sharedMesh = null;
+		coll.sharedMesh = mesh;
+
 		return mesh;
 	}
 }
