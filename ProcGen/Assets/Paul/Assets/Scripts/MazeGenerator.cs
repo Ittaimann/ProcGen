@@ -44,9 +44,14 @@ public class MazeGenerator : MonoBehaviour {
 		int total = gridx * gridy;
 		while(visitedCount < total) {
 			ClearBuffer();
+			x = current.x;
+			y = current.y;
 			current = walk(current.x, current.y);
-			if(current == null)
-				current = hunt();	
+			if(current == null) {
+				Debug.Log(x + " " + y);
+				ClearBuffer();
+				current = hunt();
+			}	
 		}
 		return tree.Combine();
 	}
@@ -99,23 +104,7 @@ public class MazeGenerator : MonoBehaviour {
 		directionMap[x,y] = direction;
 		visited[x,y] = true;
 		++visitedCount;
-		/*Find walls. A wall is created for either:
-		1. edges of the grid or 
-		2. neighboring points that have already been visited*/
-		int wx = 0, wy = 0;
-		for(int i = 0; i < 4; ++i) {
-			wx = x + dx[(int) directions[indices[i]]];
-			wy = y + dy[(int) directions[indices[i]]];
-			if(!(wx > -1 && wx < gridx && wy > -1 && wy < gridy)) {
-				insertWall(directions[indices[i]]);
-				tree.GetNode(x, y).addWall();
-			}
-			else if(prev != null && !(prev.x == wx && prev.y == wy) && visited[wx, wy] && tree.GetNode(wx, wy).wallCount < 3 && tree.GetNode(x,y).wallCount < 3) {
-				tree.GetNode(wx, wy).addWall();
-				tree.GetNode(x, y).addWall();
-				insertWall(directions[indices[i]]);
-			}
-		}
+		setWalls(x, y, indices);
 		int nx = 0, ny = 0;
 		//Find neighboring point in grid that hasn't been visited
 		for(int i = 0; i < 4; ++i) {
@@ -160,6 +149,21 @@ public class MazeGenerator : MonoBehaviour {
 						}
 					}
 		return null;
+	}
+
+	private void setWalls(int x, int y, int[] indices) {
+		/*Find walls. A wall is created for either:
+		1. edges of the grid or 
+		2. neighboring points that have already been visited*/
+		int wx = 0, wy = 0;
+		for(int i = 0; i < 4; ++i) {
+			wx = x + dx[(int) directions[indices[i]]];
+			wy = y + dy[(int) directions[indices[i]]];
+			if(!(wx > -1 && wx < gridx && wy > -1 && wy < gridy))
+				insertWall(directions[indices[i]]);
+			else if(prev != null && !(prev.x == wx && prev.y == wy) && visited[wx, wy])
+				insertWall(directions[indices[i]]);
+		}
 	}
 
 	private void restore() {

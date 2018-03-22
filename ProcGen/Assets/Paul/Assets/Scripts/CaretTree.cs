@@ -10,13 +10,11 @@ public class CaretTree {
 		public int y;
 		public Node next;
 		public List<Node> carets;
-		public int wallCount;
 		public Node(string lsymbols, int x, int y) {
 			this.lsymbols = lsymbols;
 			this.x = x;
 			this.y = y;
 			carets = new List<Node>();
-			this.wallCount = 0;
 		}
 
 		public void insert(Node head, Node newNode) {
@@ -31,10 +29,6 @@ public class CaretTree {
 					node.next = newNode;	
 					return;
 				}
-		}
-
-		public void addWall() {
-			++wallCount;
 		}
 	}
 
@@ -56,8 +50,6 @@ public class CaretTree {
 	}
 
 	public void AddNode(Node parent, Node head, Node newNode) {
-		if(GetNode(newNode.x, newNode.y) != null)
-			return;
 		if(root == null) {
 			root = newNode;
 			return;

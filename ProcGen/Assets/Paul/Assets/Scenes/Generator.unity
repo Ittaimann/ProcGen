@@ -227,7 +227,7 @@ MonoBehaviour:
   groundMat: {fileID: 2100000, guid: 4b5dce0492bdfb648a389fe390071625, type: 2}
   wallMat: {fileID: 2100000, guid: 6fd099d339b4ae34692c8258e4f87531, type: 2}
   root: {fileID: 1245656968224574, guid: 8e294cca5f013174aa96621c7d2f59a7, type: 2}
-  sentence: {fileID: 11400000, guid: 85d8c5ed38e61f6449d2b3f3ce215d56, type: 2}
+  sentence: {fileID: 11400000, guid: c54cec1be6fe14f438df20c287d50a47, type: 2}
 --- !u!4 &420889053
 Transform:
   m_ObjectHideFlags: 0
@@ -306,3 +306,47 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1618106359
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1618106361}
+  - component: {fileID: 1618106360}
+  m_Layer: 0
+  m_Name: Generator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1618106360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1618106359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9962cd636f42b20419c8ae173a3725a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sentenceName: BigMaze
+  rules: {fileID: 11400000, guid: 8c340e53db6903b48b09ae0f292af620, type: 2}
+  gridx: 100
+  gridy: 100
+--- !u!4 &1618106361
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1618106359}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 437.18994, y: -41.46322, z: -110.379135}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -26,6 +26,26 @@ ModelImporter:
     100036: spine_abdomen
     100038: spine_chest
     100040: spine_neck
+    100042: polySurface13
+    100044: polySurface18
+    100046: polySurface18 1
+    100048: polySurface19
+    100050: polySurface20
+    100052: polySurface21
+    100054: polySurface22
+    100056: polySurface23
+    100058: polySurface24
+    100060: polySurface25
+    100062: transform1
+    100064: transform10
+    100066: transform2
+    100068: transform3
+    100070: transform4
+    100072: transform5
+    100074: transform6
+    100076: transform7
+    100078: transform8
+    100080: transform9
     400000: //RootNode
     400002: Head
     400004: hip
@@ -47,6 +67,26 @@ ModelImporter:
     400036: spine_abdomen
     400038: spine_chest
     400040: spine_neck
+    400042: polySurface13
+    400044: polySurface18
+    400046: polySurface18 1
+    400048: polySurface19
+    400050: polySurface20
+    400052: polySurface21
+    400054: polySurface22
+    400056: polySurface23
+    400058: polySurface24
+    400060: polySurface25
+    400062: transform1
+    400064: transform10
+    400066: transform2
+    400068: transform3
+    400070: transform4
+    400072: transform5
+    400074: transform6
+    400076: transform7
+    400078: transform8
+    400080: transform9
     2100000: lambert1
     2100002: phongE2
     4300000: polySurface12

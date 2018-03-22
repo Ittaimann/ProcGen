@@ -34,8 +34,6 @@ public abstract class Turtle : MonoBehaviour {
 			return new State(cursor, angle);			
 		}
 	}
-
-	private Color lineColor = Color.red;
 	private Material lineMaterial;
 	private void DrawLine(Vector2 start, Vector2 end) {
 		GL.Begin(GL.LINES);
@@ -83,6 +81,8 @@ public abstract class Turtle : MonoBehaviour {
 		Mesh mesh = plane.GetComponent<MeshFilter>().mesh;
 		Vector3[] vertices = mesh.vertices;
 		Vector3 wall_center = center + direction * length / 2;
+		Debug.Log(center);
+		Debug.Log(wall_center);
 		float radius = Mathf.Sqrt(Mathf.Pow(length / 2, 2));
 		Vector3 strafe = Vector3.Cross(-direction, Vector3.back);
 		wall_center += Vector3.back * length / 2;
@@ -162,7 +162,7 @@ public abstract class Turtle : MonoBehaviour {
 				case 'L':
 				case 'R':
 				case 'B':
-					center = cur_state.cursor - new Vector2(Mathf.Cos(cur_state.angle), Mathf.Sin(cur_state.angle)) * length;
+					center = cur_state.cursor;
 					break;
 			}
 			switch(c) {
@@ -171,12 +171,12 @@ public abstract class Turtle : MonoBehaviour {
 					PlaceBackWall(center, Vector2.up);
 					break;
 				case 'L':
-					PlaceFrontWall(center, Vector2.left);
-					PlaceBackWall(center, Vector2.left);
-					break;
-				case 'R':
 					PlaceFrontWall(center, Vector2.right);
 					PlaceBackWall(center, Vector2.right);
+					break;
+				case 'R':
+					PlaceFrontWall(center, Vector2.left);
+					PlaceBackWall(center, Vector2.left);
 					break;
 				case 'B':
 					PlaceFrontWall(center, Vector2.down);
